@@ -1,0 +1,50 @@
+---
+import Layout from "@/layouts/Layout.astro"
+
+import AboutMe from "@/components/AboutMe.astro"
+import Approach from "@/components/Approach.astro"
+import Contact from "@/components/Contact.astro"
+import Experience from "@/components/Experience.astro"
+import Hero from "@/components/Hero.astro"
+import Projects from "@/components/Projects.astro"
+import SectionContainer from "@/components/SectionContainer.astro"
+import TitleSection from "@/components/TitleSection.astro"
+import { CONTENT, type Lang } from "@/i18n/content"
+
+interface Props {
+  lang: Lang
+}
+
+const { lang } = Astro.props
+const t = CONTENT[lang]
+---
+
+<Layout title={t.meta.title} description={t.meta.description} lang={lang}>
+  <main>
+    <Hero lang={lang} />
+
+    <SectionContainer id="sobre-mi">
+      <TitleSection index={t.about.index} label={t.about.label}>{t.about.title}</TitleSection>
+      <AboutMe lang={lang} />
+    </SectionContainer>
+
+    <SectionContainer id="experiencia">
+      <TitleSection index={t.experience.index} label={t.experience.label}>{t.experience.title}</TitleSection>
+      <Experience lang={lang} />
+    </SectionContainer>
+
+    <SectionContainer id="proyectos">
+      <TitleSection index={t.projects.index} label={t.projects.label}>{t.projects.title}</TitleSection>
+      <p class="reveal mt-4 max-w-xl text-lg leading-relaxed">{t.projects.intro}</p>
+      <Projects lang={lang} />
+    </SectionContainer>
+
+    <SectionContainer id="enfoque">
+      <Approach lang={lang} />
+    </SectionContainer>
+
+    <SectionContainer id="contacto">
+      <Contact lang={lang} />
+    </SectionContainer>
+  </main>
+</Layout>

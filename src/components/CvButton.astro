@@ -1,0 +1,43 @@
+---
+import { CONTENT, type Lang } from "@/i18n/content"
+import { getCv } from "@/lib/cv"
+
+interface Props {
+  lang: Lang
+  class?: string
+}
+
+const { lang, class: className = "" } = Astro.props
+const { ui } = CONTENT[lang]
+const cv = getCv(lang)
+---
+
+{
+  cv ? (
+    <a
+      href={cv.url}
+      download={cv.filename}
+      class={`inline-flex items-center gap-2 rounded-sm border border-line px-4 py-2.5 text-sm font-medium text-ink transition hover:-translate-y-0.5 hover:border-accent/60 ${className}`}
+    >
+      <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 4v11" />
+        <path d="m7 10 5 5 5-5" />
+        <path d="M5 20h14" />
+      </svg>
+      {ui.cv}
+    </a>
+  ) : (
+    <span
+      class={`inline-flex cursor-not-allowed items-center gap-2 rounded-sm border border-dashed border-line px-4 py-2.5 text-sm font-medium text-muted ${className}`}
+      aria-disabled="true"
+      title={ui.cvSoon}
+    >
+      <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 4v11" />
+        <path d="m7 10 5 5 5-5" />
+        <path d="M5 20h14" />
+      </svg>
+      {ui.cvSoon}
+    </span>
+  )
+}

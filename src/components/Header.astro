@@ -1,110 +1,115 @@
 ---
 import ThemeToggle from "./ThemeToggle.astro"
+import GitHubIcon from "./icons/GitHub.astro"
+import { CONTENT, LANG_PATH, LINKS, type Lang } from "@/i18n/content"
 
-const navItems = [
-  {
-    title: "Experiencia",
-    label: "experiencia",
-    url: "/#experiencia",
-  },
-  {
-    title: "Proyectos",
-    label: "proyectos",
-    url: "/#proyectos",
-  },
-  {
-    title: "Sobre mí",
-    label: "sobre-mi",
-    url: "/#sobre-mi",
-  },
-  {
-    title: "Contacto",
-    label: "contacto",
-    url: "mailto:miduga@gmail.com",
-  },
-]
+interface Props {
+  lang: Lang
+}
+
+const { lang } = Astro.props
+const t = CONTENT[lang]
+const otherLang: Lang = lang === "es" ? "en" : "es"
 ---
 
-<header
-  class="fixed top-0 z-10 flex items-center justify-center w-full mx-auto mt-2"
->
-  <nav
-    class="flex px-3 text-sm font-medium rounded-full text-gray-600 dark:text-gray-200 justify-center items-center"
-  >
-    {
-      navItems.map((link) => (
-        <a
-          class="relative block px-2 py-2 transition hover:text-blue-500 dark:hover:text-blue-500"
-          aria-label={link.label}
-          href={link.url}
-        >
-          {link.title}
-        </a>
-      ))
-    }
-    <ThemeToggle />
-  </nav>
+<header id="site-header" class="fixed inset-x-0 top-0 z-50 border-b border-transparent transition-colors duration-300">
+  <div class="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-5 md:px-8 xl:max-w-none xl:pl-12 xl:pr-12">
+    <a href="#inicio" class="group flex items-center gap-2" aria-label="Jose Hernández — inicio">
+      <span class="font-mono text-sm font-bold text-ink">
+        <span class="text-accent">~/</span>jose.hernandez<span class="text-accent transition-opacity group-hover:opacity-0">_</span>
+      </span>
+    </a>
+
+    <nav class="hidden md:block" aria-label="Main">
+      <ul class="flex items-center gap-1 text-sm">
+        {
+          t.nav.map((item) => (
+            <li>
+              <a class="nav-link relative px-3 py-2 text-body transition-colors hover:text-ink" href={`#${item.id}`} data-target={item.id}>
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="flex items-center gap-2">
+      <a
+        id="lang-switch"
+        href={LANG_PATH[otherLang]}
+        hreflang={otherLang}
+        class="flex h-9 items-center gap-1 rounded-sm border border-line px-2.5 font-mono text-xs text-body transition hover:border-accent/60 hover:text-ink"
+        aria-label={t.ui.switchLangLabel}
+        title={t.ui.switchLangLabel}
+      >
+        <span class:list={[lang === "es" ? "text-accent" : "text-muted"]}>ES</span>
+        <span class="text-line">/</span>
+        <span class:list={[lang === "en" ? "text-accent" : "text-muted"]}>EN</span>
+      </a>
+      <a
+        class="icon-btn"
+        href={LINKS.github}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={`GitHub (${t.ui.opensNewTab})`}
+      >
+        <GitHubIcon class="size-4" />
+      </a>
+      <div class="icon-btn">
+        <ThemeToggle label={t.ui.theme} />
+      </div>
+    </div>
+  </div>
+
+  <!-- Progreso en pantallas sin barra lateral -->
+  <div class="absolute inset-x-0 bottom-0 h-0.5 xl:hidden" aria-hidden="true">
+    <div id="top-progress" class="h-full origin-left scale-x-0 bg-accent"></div>
+  </div>
 </header>
+
+<style>
+  .icon-btn {
+    @apply grid size-9 place-items-center rounded-sm border border-line text-body transition hover:border-accent/60 hover:text-ink;
+  }
+
+  #site-header.scrolled {
+    @apply border-line/70 bg-bg/80 backdrop-blur-md;
+  }
+
+  .nav-link::after {
+    content: "";
+    @apply absolute inset-x-3 -bottom-0.5 h-0.5 origin-left scale-x-0 bg-accent transition-transform duration-300;
+  }
+
+  .nav-link.active {
+    @apply text-ink;
+  }
+
+  .nav-link.active::after {
+    @apply scale-x-100;
+  }
+</style>
 
 <script>
   document.addEventListener("astro:page-load", () => {
-    const sections = document.querySelectorAll("section")
-    const navItems = document.querySelectorAll("header nav a")
+    const controller = new AbortController()
+    document.addEventListener("astro:before-swap", () => controller.abort(), { once: true })
 
-    const callback = (entries: any[]) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          navItems.forEach((item) => {
-            if (item.getAttribute("aria-label") == entry.target.id) {
-              item.classList.add("text-blue-500")
-            } else {
-              item.classList.remove("text-blue-500")
-            }
-          })
-        }
-      })
-    }
+    const header = document.getElementById("site-header")
+    const onScroll = () => header?.classList.toggle("scrolled", window.scrollY > 8)
+    onScroll()
+    window.addEventListener("scroll", onScroll, { passive: true, signal: controller.signal })
 
-    const observer = new IntersectionObserver(callback, {
-      root: null,
-      rootMargin: "0px",
-      threshold: 0.3,
-    })
-
-    sections.forEach((section) => {
-      observer.observe(section)
-    })
-
-    // Cleanup function
-    document.onvisibilitychange = () => {
-      if (document.visibilityState === "hidden") {
-        observer.disconnect()
-      } else {
-        sections.forEach((section) => {
-          observer.observe(section)
-        })
-      }
-    }
+    // Al cambiar de idioma se conserva la sección actual
+    const langSwitch = document.getElementById("lang-switch") as HTMLAnchorElement | null
+    langSwitch?.addEventListener(
+      "click",
+      () => {
+        const active = document.querySelector<HTMLElement>(".nav-link.active")
+        if (active?.dataset.target) langSwitch.hash = active.dataset.target
+      },
+      { signal: controller.signal }
+    )
   })
 </script>
-
-<style>
-  nav {
-    animation: nav-shadown 1s linear both;
-    animation-timeline: scroll();
-    animation-range: 0 100px;
-  }
-
-  nav {
-    @apply dark:bg-gray-800/90 bg-white/50;
-  }
-
-  @keyframes nav-shadown {
-    0% {
-      @apply dark:bg-gray-800/0 bg-white/0;
-    }
-    to {
-      @apply shadow-lg ring-1 backdrop-blur ring-white/10;
-    }
-  }
-</style>
