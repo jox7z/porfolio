@@ -1,0 +1,7 @@
+# Netlify: construye el sitio con Astro y publica solo la carpeta generada.
+[build]
+  command = "pnpm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
