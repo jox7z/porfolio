@@ -10,72 +10,70 @@ const { lang } = Astro.props
 const { ui, projects } = CONTENT[lang]
 ---
 
-<ol class="project-list mt-12 border-b border-line">
+<!--
+  Tarjetas compactas: a la vista solo el resumen y el stack; el contexto y los
+  detalles técnicos quedan dentro de un desplegable para no saturar de texto.
+-->
+<ol class="mt-12 grid items-start gap-5 md:grid-cols-2">
   {
     projects.items.map((project, i) => (
-      <li class="reveal">
-        <article class="project surface-glow group grid gap-6 border-t border-line py-10 md:grid-cols-[9rem_1fr] md:gap-10 lg:px-4">
-          <div class="flex items-start gap-4 md:block">
-            <span class="block font-mono text-sm text-muted transition-colors duration-300 group-hover:text-accent">
-              {String(i + 1).padStart(2, "0")}
-            </span>
-            <div class="md:mt-4">
-              <p class="font-mono text-xs text-muted">{project.year}</p>
-              <ul class="mt-2 flex flex-wrap gap-1.5 md:flex-col md:items-start" aria-label="Tags">
-                {project.tags.map((tag) => (
-                  <li class="rounded-sm bg-accent/10 px-2 py-0.5 font-mono text-[11px] text-accent">{tag}</li>
-                ))}
-              </ul>
-              {project.status && (
-                <p class="mt-3 inline-flex items-center gap-1.5 font-mono text-[11px] text-accent2">
-                  <span class="size-1.5 rounded-full bg-accent2" aria-hidden="true" />
-                  {project.status}
+      <li class="reveal" style={`--reveal-delay: ${(i % 2) * 100}ms`}>
+        <article class="project-card group h-full rounded-lg p-px">
+          <div class="surface-glow flex h-full flex-col rounded-[calc(0.5rem-1px)] bg-surface p-6">
+            <header class="flex items-start justify-between gap-4">
+              <div>
+                <p class="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-xs text-muted">
+                  <span class="text-accent">{String(i + 1).padStart(2, "0")}</span>
+                  <span>{project.year}</span>
+                  {project.status && (
+                    <span class="inline-flex items-center gap-1.5 text-accent2">
+                      <span class="size-1.5 rounded-full bg-accent2" aria-hidden="true" />
+                      {project.status}
+                    </span>
+                  )}
                 </p>
-              )}
-            </div>
-          </div>
-
-          <div>
-            <header class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
-              <h3 class="text-2xl font-bold text-ink sm:text-3xl">
-                {project.title}
-                {project.role && <span class="ml-2 align-middle font-mono text-xs font-normal text-muted">· {project.role}</span>}
-              </h3>
+                <h3 class="mt-2 text-2xl font-bold text-ink">
+                  {project.title}
+                  {project.role && <span class="ml-2 align-middle font-mono text-xs font-normal text-muted">· {project.role}</span>}
+                </h3>
+              </div>
               <a
                 href={project.github}
                 target="_blank"
                 rel="noopener noreferrer"
-                class="inline-flex items-center gap-2 font-mono text-xs text-body transition-colors hover:text-accent"
+                class="grid size-9 shrink-0 place-items-center rounded-sm border border-line text-body transition hover:border-accent/60 hover:text-accent"
                 aria-label={`${ui.viewCode}: ${project.title} (${ui.opensNewTab})`}
+                title={ui.viewCode}
               >
                 <GitHubIcon class="size-4" />
-                {ui.viewCode}
-                <span aria-hidden="true" class="transition-transform group-hover:translate-x-1">→</span>
               </a>
             </header>
 
-            <p class="mt-3 max-w-2xl text-lg leading-relaxed text-ink/90">{project.summary}</p>
+            <p class="mt-3 min-h-[5.1em] leading-relaxed text-body">{project.summary}</p>
 
-            <div class="mt-5 max-w-2xl border-l-2 border-accent2/60 bg-accent2/[0.04] py-3 pl-4 pr-3">
-              <p class="font-mono text-[11px] uppercase tracking-widest text-accent2">// {ui.context}</p>
-              <p class="mt-1.5 leading-relaxed">{project.context}</p>
-            </div>
-
-            <p class="mt-6 font-mono text-[11px] uppercase tracking-widest text-muted">// {ui.howItWorks}</p>
-            <ul class="mt-3 max-w-2xl space-y-2 leading-relaxed">
-              {project.highlights.map((highlight) => (
-                <li class="flex gap-3">
-                  <span class="mt-[0.6rem] h-0.5 w-3 shrink-0 bg-accent transition-all duration-300 group-hover:w-5" aria-hidden="true" />
-                  <span>{highlight}</span>
-                </li>
+            <ul class="mt-5 flex flex-wrap gap-1.5" aria-label={ui.stack}>
+              {project.stack.slice(0, 5).map((tech) => (
+                <li class="rounded-sm border border-line px-2 py-0.5 font-mono text-xs text-muted">{tech}</li>
               ))}
             </ul>
 
-            <ul class="mt-6 flex flex-wrap gap-2" aria-label={ui.stack}>
-              {project.stack.map((tech) => (
-                <li class="rounded-sm border border-line px-2 py-1 font-mono text-[11px] text-muted">{tech}</li>
-              ))}
-            </ul>
+            <details class="details mt-5 border-t border-line pt-4">
+              <summary class="flex cursor-pointer list-none items-center justify-between font-mono text-xs uppercase tracking-widest text-muted transition-colors hover:text-ink">
+                {ui.howItWorks}
+                <span class="chevron text-accent transition-transform duration-300" aria-hidden="true">+</span>
+              </summary>
+              <div class="details-body">
+                <p class="mt-4 text-sm leading-relaxed text-muted">{project.context}</p>
+                <ul class="mt-3 space-y-2 text-sm leading-relaxed">
+                  {project.highlights.map((highlight) => (
+                    <li class="flex gap-3">
+                      <span class="mt-[0.6rem] h-0.5 w-3 shrink-0 bg-accent" aria-hidden="true" />
+                      <span>{highlight}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </details>
           </div>
         </article>
       </li>
@@ -84,14 +82,67 @@ const { ui, projects } = CONTENT[lang]
 </ol>
 
 <style>
-  /* Al recorrer la lista, los demás proyectos pasan a segundo plano */
-  @media (hover: hover) and (min-width: 1024px) {
-    .project {
-      transition: opacity 0.35s ease;
-    }
+  /* Borde de luz: un degradado cónico que gira detrás de la tarjeta al pasar el cursor */
+  @property --angle {
+    syntax: "<angle>";
+    initial-value: 0deg;
+    inherits: false;
+  }
 
-    .project-list:hover .project:not(:hover) {
-      opacity: 0.45;
+  .project-card {
+    background: rgb(var(--c-line));
+    transition: background 0.3s ease;
+  }
+
+  .project-card:hover,
+  .project-card:focus-within {
+    background: conic-gradient(
+      from var(--angle),
+      rgb(var(--c-line)) 0deg,
+      rgb(var(--c-accent)) 60deg,
+      rgb(var(--c-accent2)) 120deg,
+      rgb(var(--c-line)) 180deg,
+      rgb(var(--c-line)) 360deg
+    );
+    animation: spin-border 3s linear infinite;
+  }
+
+  @keyframes spin-border {
+    to {
+      --angle: 360deg;
     }
+  }
+
+  .details[open] .chevron {
+    transform: rotate(45deg);
+  }
+
+  .details summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .details[open] .details-body {
+    animation: open 0.35s ease-out;
+  }
+
+  @keyframes open {
+    from {
+      opacity: 0;
+      transform: translateY(-6px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* Movimiento desactivado con el botón Motion */
+  :global(html.motion-off) .project-card:hover,
+  :global(html.motion-off) .project-card:focus-within {
+    animation: none;
+  }
+
+  :global(html.motion-off) .details[open] .details-body {
+    animation: none;
   }
 </style>

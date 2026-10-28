@@ -1,0 +1,134 @@
+---
+import type { Lang } from "@/i18n/content"
+
+interface Props {
+  lang: Lang
+}
+
+// Secuencia de arranque tipo terminal; solo se ve la primera vez de cada visita
+const LINES: Record<Lang, string[]> = {
+  en: [
+    "hardware check",
+    "network: connected · San José, CR",
+    "loading skills: it-support · dev · sql",
+    "user support: en · es",
+  ],
+  es: [
+    "revisión de hardware",
+    "red: conectada · San José, CR",
+    "cargando habilidades: soporte-ti · dev · sql",
+    "atención a usuarios: es · en",
+  ],
+}
+const lines = LINES[Astro.props.lang]
+const skip = Astro.props.lang === "es" ? "clic o tecla para saltar" : "click or press any key to skip"
+---
+
+<div id="intro-boot" class="intro-boot fixed inset-0 z-[100] place-items-center bg-bg px-6" aria-hidden="true">
+  <div class="w-full max-w-md font-mono text-sm">
+    <p class="boot-line text-muted" style="--d: 0">
+      <span class="text-accent">&gt;</span> booting <span class="text-ink">jose.hernandez</span>
+    </p>
+    <ul class="mt-4 space-y-1.5">
+      {
+        lines.map((line, i) => (
+          <li class="boot-line flex gap-3" style={`--d: ${i + 1}`}>
+            <span class="text-accent2">[ OK ]</span>
+            <span class="text-body">{line}</span>
+          </li>
+        ))
+      }
+    </ul>
+
+    <div class="boot-line mt-6" style={`--d: ${lines.length + 1}`}>
+      <div class="h-0.5 overflow-hidden bg-line">
+        <div class="boot-bar h-full origin-left bg-gradient-to-r from-accent to-accent2"></div>
+      </div>
+      <p class="mt-3 flex justify-between text-xs text-muted">
+        <span class="text-ink">~/jose.hernandez<span class="text-accent">_</span></span>
+        <span>{skip}</span>
+      </p>
+    </div>
+  </div>
+</div>
+
+<style>
+  .intro-boot {
+    display: none;
+  }
+
+  /* La clase la pone un script en <head> antes de pintar, así no hay parpadeo */
+  :global(html.intro) .intro-boot {
+    display: grid;
+  }
+
+  :global(html.intro-out) .intro-boot {
+    display: grid;
+    animation: boot-exit 0.75s cubic-bezier(0.76, 0, 0.24, 1) forwards;
+  }
+
+  .boot-line {
+    opacity: 0;
+    animation: boot-line 0.3s ease-out forwards;
+    animation-delay: calc(var(--d) * 220ms);
+  }
+
+  .boot-bar {
+    transform: scaleX(0);
+    animation: boot-bar 0.7s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+    animation-delay: 1.3s;
+  }
+
+  @keyframes boot-line {
+    from {
+      opacity: 0;
+      transform: translateX(-8px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes boot-bar {
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  /* La pantalla se recoge hacia arriba y deja ver el portafolio */
+  @keyframes boot-exit {
+    to {
+      clip-path: inset(0 0 100% 0);
+    }
+  }
+</style>
+
+<script>
+  const DURATION = 2200
+
+  document.addEventListener("astro:page-load", () => {
+    const root = document.documentElement
+    if (!root.classList.contains("intro")) return
+
+    let done = false
+    const finish = () => {
+      if (done) return
+      done = true
+      try {
+        sessionStorage.setItem("intro-seen", "1")
+      } catch {}
+      root.classList.replace("intro", "intro-out")
+      document.dispatchEvent(new Event("intro:done"))
+      window.setTimeout(() => root.classList.remove("intro-out"), 800)
+    }
+
+    const timer = window.setTimeout(finish, DURATION)
+    const skip = () => {
+      window.clearTimeout(timer)
+      finish()
+    }
+    window.addEventListener("pointerdown", skip, { once: true })
+    window.addEventListener("keydown", skip, { once: true })
+  })
+</script>

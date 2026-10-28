@@ -1,10 +1,11 @@
 export type Lang = "es" | "en"
 
-export const LANGS: Lang[] = ["es", "en"]
+export const LANGS: Lang[] = ["en", "es"]
 
+// El sitio inicia en inglés
 export const LANG_PATH: Record<Lang, string> = {
-  es: "/",
-  en: "/en/",
+  en: "/",
+  es: "/es/",
 }
 
 export const LINKS = {
@@ -53,6 +54,8 @@ interface Content {
     howItWorks: string
     stack: string
     opensNewTab: string
+    motionOn: string
+    motionOff: string
   }
   hero: {
     status: string
@@ -71,9 +74,6 @@ interface Content {
     label: string
     title: string
     paragraphs: string[]
-    facts: { label: string; value: string }[]
-    techTitle: string
-    tech: { group: string; items: string[] }[]
   }
   experience: { index: string; label: string; title: string; items: TimelineItem[] }
   projects: { index: string; label: string; title: string; intro: string; items: Project[] }
@@ -109,15 +109,11 @@ const GITHUB = {
   mediakit: "https://github.com/jox7z/MediaKit",
 }
 
-const TECH_DEV = ["TypeScript", "JavaScript", "C# .NET", "React", "React Native", "Node.js", "Git", "Azure DevOps", "Scrum"]
-const TECH_DATA = ["SQL", "PostgreSQL", "SQL Server", "Oracle PL/SQL", "Supabase", "Prisma"]
-const TECH_IT = ["TCP/IP", "DNS", "DHCP", "VPN", "Linux", "Windows Server", "Hardware", "Docker"]
-
 const es: Content = {
   meta: {
     title: "Jose Hernández — Ingeniero en Sistemas Computacionales",
     description:
-      "Portafolio de Jose Hernández, ingeniero en sistemas computacionales de San José, Costa Rica. Abierto a puestos de Junior Software Developer, datos con SQL y bases de datos, y soporte de TI y redes.",
+      "Portafolio de Jose Hernández, ingeniero en sistemas computacionales de San José, Costa Rica. Técnico de soporte TI, abierto a puestos de Help Desk, soporte TI, Junior Software Developer y datos con SQL.",
   },
   nav: [
     { id: "sobre-mi", label: "Sobre mí" },
@@ -138,45 +134,34 @@ const es: Content = {
     howItWorks: "Cómo funciona",
     stack: "Tecnologías",
     opensNewTab: "se abre en otra pestaña",
+    motionOn: "Movimiento activado",
+    motionOff: "Movimiento en pausa",
   },
   hero: {
     status: "Disponible para trabajar",
     greeting: "Hola, soy Jose Hernández",
     role: "Computer Systems Engineer",
     openTo: "Abierto a",
-    roles: ["Junior Software Developer", "Datos · SQL y bases de datos", "IT · Redes y resolución de problemas"],
-    learning: "Aprendiendo: seguridad de endpoints y ciberseguridad",
+    roles: ["Soporte TI · Help Desk", "Junior Software Developer", "Datos · SQL y bases de datos"],
+    learning: "Aprendiendo: ServiceNow, administración de Microsoft 365 y ciberseguridad",
     intro:
-      "Desarrollo software, diseño bases de datos y resuelvo problemas de TI y redes. Me gusta entender cómo fallan los sistemas para construirlos mejor.",
+      "Reparo computadoras, atiendo usuarios en español e inglés y desarrollo software.",
     ctaPrimary: "Escríbeme",
     scroll: "scroll para ver mi trabajo",
     terminal: [
-      { command: "whoami", output: "computer-systems-engineer" },
-      { command: "cat open-to.txt", output: "junior-dev · data/sql · it-support" },
-      { command: "cat learning.txt", output: "endpoint-security · cybersecurity" },
+      { command: "whoami", output: "it-support-technician · systems-engineer" },
+      { command: "cat open-to.txt", output: "help-desk · it-support · junior-dev" },
+      { command: "cat learning.txt", output: "servicenow · m365-admin · cybersecurity" },
       { command: "date", output: "", live: true },
     ],
   },
   about: {
     index: "01",
     label: "Sobre mí",
-    title: "Software, datos, redes y resolución de problemas",
+    title: "Soporte TI con base de ingeniería",
     paragraphs: [
-      "Soy <strong>ingeniero en sistemas computacionales</strong>, graduado en 2026. Disfruto llevar una idea desde cero hasta algo que funciona, y entender a fondo por qué algo falla.",
-      "He trabajado con <strong>bases de datos</strong> en PostgreSQL, SQL Server y Oracle, y he construido apps web, móviles y de escritorio. También tengo base en <strong>redes e infraestructura</strong>: TCP/IP, DNS, DHCP, Linux, Windows Server y hardware, gracias a la universidad y a mi formación técnica en redes.",
-      "Vengo de <strong>prevención de fraude y respuesta a incidentes</strong> para Capital One, trabajando 100 % en inglés. Hoy estoy aprendiendo <strong>seguridad de endpoints y ciberseguridad</strong>.",
-    ],
-    facts: [
-      { label: "Busco", value: "Junior Dev · Data · IT" },
-      { label: "Fuerte en", value: "SQL y diagnóstico" },
-      { label: "Aprendiendo", value: "Endpoints y ciberseguridad" },
-      { label: "Idiomas", value: "Español · Inglés profesional" },
-    ],
-    techTitle: "stack",
-    tech: [
-      { group: "dev", items: TECH_DEV },
-      { group: "data", items: TECH_DATA },
-      { group: "it", items: TECH_IT },
+      "Soy <strong>Ingeniero en Sistemas Computacionales</strong> enfocado en <strong>soporte de TI</strong>. Diagnostico y resuelvo incidentes de hardware, software y conectividad, instalo y configuro Windows y macOS, y doy soporte a usuarios en sitio y de forma remota.",
+      "En <strong>Capital One</strong> atendí entre 60 y 90 casos de fraude al día, en inglés, con estándares estrictos de calidad y seguridad. Hoy combino el soporte técnico con el desarrollo de software como cofundador de <strong>Limes Dev</strong>, y cuento con la certificación <strong>Fortinet Certified Fundamentals in Cybersecurity</strong>.",
     ],
   },
   experience: {
@@ -186,16 +171,46 @@ const es: Content = {
     items: [
       {
         kind: "Trabajo",
-        date: "2024 — 2025",
-        title: "Analista de ciberseguridad, prevención de fraude",
+        date: "Jul 2026 — Hoy",
+        title: "Técnico de Soporte TI",
+        company: "Reparaciones HM · Independiente",
+        points: [
+          "Diagnóstico, reparación y mantenimiento de 4–10 equipos al mes.",
+          "Instalación de Windows, macOS, controladores y aplicaciones.",
+          "Puntos de venta Eleventa, impresoras Epson y soporte remoto con AnyDesk.",
+        ],
+        skills: ["Hardware", "Windows · macOS", "AnyDesk", "POS"],
+      },
+      {
+        kind: "Startup",
+        date: "Dic 2025 — Hoy",
+        title: "Cofundador y Desarrollador Full-Stack",
+        company: "Limes Dev",
+        points: [
+          "Con dos compañeros desarrollamos software y sitios web para negocios, como Finity, una plataforma SaaS contable.",
+          "Lidero el equipo técnico, atiendo clientes y organizo los sprints en Jira.",
+        ],
+        skills: ["Liderazgo técnico", "Clientes", "Jira", "Full-stack"],
+      },
+      {
+        kind: "Trabajo",
+        date: "Ene 2024 — Mar 2025",
+        title: "Fraud & Credit Specialist",
         company: "Foundever — Capital One",
         points: [
-          "Detectaba patrones de fraude y protegía cuentas de clientes con las herramientas de seguridad de Capital One.",
-          "Resolvía incidentes críticos cuidando datos financieros sensibles bajo cumplimiento PCI.",
-          "Toda la comunicación fue 100 % en inglés, tanto con clientes como con mi equipo de trabajo.",
-          "Superé de forma constante los SLA y métricas; reconocido como top performer.",
+          "60–90 llamadas y chats diarios de fraude, 100 % en inglés.",
+          "Restablecía accesos, documentaba y escalaba casos por Microsoft Teams.",
+          "Top performer; mi trabajo se usó para capacitar a los nuevos agentes.",
         ],
-        skills: ["Detección de fraude", "Respuesta a incidentes", "PCI DSS", "Inglés profesional"],
+        skills: ["Atención al usuario", "Escalamiento", "PCI DSS", "Inglés profesional"],
+      },
+      {
+        kind: "Bootcamp",
+        date: "Oct — Dic 2026",
+        title: "Bootcamp de Soporte TI",
+        company: "Generation Colombia · Remoto",
+        points: ["Programa remoto de soporte de TI, en curso."],
+        skills: ["Soporte TI", "Remoto"],
       },
       {
         kind: "Universidad",
@@ -203,8 +218,8 @@ const es: Content = {
         title: "Ingeniería en Sistemas Computacionales",
         company: "Universidad Tecnológica Costarricense",
         points: [
-          "Desarrollo de software, bases de datos, redes e infraestructura de TI.",
-          "Varios de los proyectos de abajo nacieron como cursos y proyectos finales en equipo.",
+          "Software, bases de datos, redes e infraestructura de TI.",
+          "Un año estudiando y trabajando a tiempo completo a la vez.",
         ],
         skills: ["Desarrollo de software", "Bases de datos", "Redes"],
       },
@@ -214,8 +229,7 @@ const es: Content = {
         title: "Técnico en Redes",
         company: "CTP Roberto Gamboa Valverde",
         points: [
-          "Cursé el programa durante dos años; me faltó medio año para completarlo.",
-          "Redes TCP/IP, direccionamiento, DNS y DHCP, cableado y hardware de red.",
+          "Redes TCP/IP, DNS, DHCP, cableado y hardware (dos años cursados).",
         ],
         skills: ["TCP/IP", "DNS / DHCP", "Hardware"],
       },
@@ -225,7 +239,7 @@ const es: Content = {
     index: "03",
     label: "Proyectos",
     title: "Lo que he construido",
-    intro: "Proyectos personales, de la universidad y en equipo: qué son, por qué los hice y cómo funcionan por dentro.",
+    intro: "Personales, universitarios y en equipo. Abre cada uno para ver cómo funciona.",
     items: [
       {
         id: "gmo",
@@ -359,24 +373,24 @@ const es: Content = {
     title: "Diagnóstico de incidentes reales,",
     highlight: "aplicado al software",
     intro:
-      "La respuesta a incidentes y mi formación en redes me enseñaron a diagnosticar con información incompleta, sistemas que dependen entre sí, usuarios afectados y tiempos de respuesta definidos. Aplico esa misma disciplina al desarrollo y al soporte.",
+      "Tres pasos que uso tanto en soporte como en desarrollo.",
     steps: [
       {
         icon: "isolate",
         title: "Aislar",
-        text: "Separo las variables de dispositivo, red, servicio y aplicación, y reproduzco la falla con la prueba mínima que la demuestre.",
+        text: "Separo dispositivo, red, servicio y aplicación, y reproduzco la falla.",
         detail: "$ síntoma → capa → causa raíz",
       },
       {
         icon: "inspect",
         title: "Inspeccionar",
-        text: "Verifico configuración TCP/IP, DNS y DHCP, conectividad y VPN, logs, estado de los servicios y los datos en la base de datos.",
+        text: "Reviso red, DNS, VPN, logs, servicios y datos.",
         detail: "$ red → servicio → base de datos → app",
       },
       {
         icon: "resolve",
         title: "Resolver y documentar",
-        text: "Registro evidencia, impacto y pasos de reproducción; resuelvo el problema o lo escalo con el contexto que el equipo necesita.",
+        text: "Lo resuelvo o lo escalo con la evidencia que el equipo necesita.",
         detail: "$ reproducir → resolver → prevenir",
       },
     ],
@@ -385,7 +399,7 @@ const es: Content = {
     index: "05",
     label: "Contacto",
     title: "Hablemos",
-    text: "Busco mi siguiente paso como Junior Software Developer, en un puesto de datos con SQL y bases de datos, o en IT y redes resolviendo problemas. Si tu equipo necesita a alguien que aprende rápido y no suelta un problema hasta resolverlo, escríbeme.",
+    text: "Busco mi siguiente paso en Help Desk, soporte TI o como Junior Developer. Si encaja con tu equipo, escríbeme.",
     cta: "Escríbeme",
   },
   footer: { built: "Hecho con Astro y Tailwind CSS" },
@@ -395,7 +409,7 @@ const en: Content = {
   meta: {
     title: "Jose Hernández — Computer Systems Engineer",
     description:
-      "Portfolio of Jose Hernández, Computer Systems Engineer from San José, Costa Rica. Open to Junior Software Developer, data (SQL and databases) and IT / networking roles.",
+      "Portfolio of Jose Hernández, Computer Systems Engineer from San José, Costa Rica. IT Support Technician open to Help Desk, IT support, Junior Software Developer and SQL data roles.",
   },
   nav: [
     { id: "sobre-mi", label: "About" },
@@ -416,45 +430,34 @@ const en: Content = {
     howItWorks: "How it works",
     stack: "Technologies",
     opensNewTab: "opens in a new tab",
+    motionOn: "Motion on",
+    motionOff: "Motion paused",
   },
   hero: {
     status: "Available for work",
     greeting: "Hi, I'm Jose Hernández",
     role: "Computer Systems Engineer",
     openTo: "Open to",
-    roles: ["Junior Software Developer", "Data · SQL & databases", "IT · Networking & troubleshooting"],
-    learning: "Learning: endpoint security and cybersecurity",
+    roles: ["IT Support · Help Desk", "Junior Software Developer", "Data · SQL & databases"],
+    learning: "Learning: ServiceNow, Microsoft 365 administration and cybersecurity",
     intro:
-      "I build software, design databases and solve IT and networking problems. I like understanding how systems fail so I can build them better.",
+      "I fix computers, support users in English and Spanish, and build software.",
     ctaPrimary: "Get in touch",
     scroll: "scroll to see my work",
     terminal: [
-      { command: "whoami", output: "computer-systems-engineer" },
-      { command: "cat open-to.txt", output: "junior-dev · data/sql · it-support" },
-      { command: "cat learning.txt", output: "endpoint-security · cybersecurity" },
+      { command: "whoami", output: "it-support-technician · systems-engineer" },
+      { command: "cat open-to.txt", output: "help-desk · it-support · junior-dev" },
+      { command: "cat learning.txt", output: "servicenow · m365-admin · cybersecurity" },
       { command: "date", output: "", live: true },
     ],
   },
   about: {
     index: "01",
     label: "About",
-    title: "Software, data, networking and problem solving",
+    title: "IT support with an engineering foundation",
     paragraphs: [
-      "I'm a <strong>Computer Systems Engineer</strong>, graduated in 2026. I enjoy taking an idea from zero to something that works, and digging in until I understand exactly why something breaks.",
-      "I've worked with <strong>databases</strong> in PostgreSQL, SQL Server and Oracle, and built web, mobile and desktop apps. I also have a foundation in <strong>networking and infrastructure</strong> — TCP/IP, DNS, DHCP, Linux, Windows Server and hardware — from university and my network technician training.",
-      "I come from <strong>fraud prevention and incident response</strong> for Capital One, working 100% in English. Right now I'm learning <strong>endpoint security and cybersecurity</strong>.",
-    ],
-    facts: [
-      { label: "Looking for", value: "Junior Dev · Data · IT" },
-      { label: "Strong in", value: "SQL & diagnostics" },
-      { label: "Learning", value: "Endpoints & cybersecurity" },
-      { label: "Languages", value: "Spanish · Professional English" },
-    ],
-    techTitle: "stack",
-    tech: [
-      { group: "dev", items: TECH_DEV },
-      { group: "data", items: TECH_DATA },
-      { group: "it", items: TECH_IT },
+      "I'm a <strong>Computer Systems Engineer</strong> focused on <strong>IT support</strong>. I diagnose and resolve hardware, software and connectivity issues, deploy and configure Windows and macOS, and support users on site and remotely.",
+      "At <strong>Capital One</strong> I handled 60 to 90 fraud cases a day in English, under strict quality and security standards. Today I combine hands-on support with software development as co-founder of <strong>Limes Dev</strong>, and I hold the <strong>Fortinet Certified Fundamentals in Cybersecurity</strong> certification.",
     ],
   },
   experience: {
@@ -464,16 +467,46 @@ const en: Content = {
     items: [
       {
         kind: "Work",
-        date: "2024 — 2025",
-        title: "Cybersecurity Analyst, Fraud Prevention",
+        date: "Jul 2026 — Now",
+        title: "IT Support Technician",
+        company: "Reparaciones HM · Self-employed",
+        points: [
+          "Diagnose, repair and maintain 4–10 computers a month.",
+          "Install Windows, macOS, drivers and applications.",
+          "Set up Eleventa POS and Epson printers; remote support with AnyDesk.",
+        ],
+        skills: ["Hardware", "Windows · macOS", "AnyDesk", "POS"],
+      },
+      {
+        kind: "Startup",
+        date: "Dec 2025 — Now",
+        title: "Co-Founder & Full-Stack Developer",
+        company: "Limes Dev",
+        points: [
+          "With two classmates, we build software and websites for businesses, such as Finity, a SaaS accounting platform.",
+          "Lead the technical team, meet clients and run our sprints in Jira.",
+        ],
+        skills: ["Technical lead", "Clients", "Jira", "Full-stack"],
+      },
+      {
+        kind: "Work",
+        date: "Jan 2024 — Mar 2025",
+        title: "Fraud & Credit Specialist",
         company: "Foundever — Capital One",
         points: [
-          "Detected fraud patterns and protected customer accounts using Capital One's security tools.",
-          "Resolved critical incidents while protecting sensitive financial data under PCI compliance.",
-          "All communication was 100% in English, with customers and with my own team.",
-          "Consistently exceeded SLAs and metrics; recognized as a top performer.",
+          "60–90 fraud calls and chats a day, 100% in English.",
+          "Restored account access, documented and escalated cases through Microsoft Teams.",
+          "Top performer; my calls were used to train new hires.",
         ],
-        skills: ["Fraud detection", "Incident response", "PCI DSS", "Professional English"],
+        skills: ["User support", "Escalation", "PCI DSS", "Professional English"],
+      },
+      {
+        kind: "Bootcamp",
+        date: "Oct — Dec 2026",
+        title: "IT Support Bootcamp",
+        company: "Generation Colombia · Remote",
+        points: ["Remote IT support program, in progress."],
+        skills: ["IT support", "Remote"],
       },
       {
         kind: "University",
@@ -481,8 +514,8 @@ const en: Content = {
         title: "Computer Systems Engineering",
         company: "Universidad Tecnológica Costarricense",
         points: [
-          "Software development, databases, networking and IT infrastructure.",
-          "Several of the projects below started as coursework and team capstones.",
+          "Software, databases, networking and IT infrastructure.",
+          "A year of studying and working full time at once.",
         ],
         skills: ["Software development", "Databases", "Networking"],
       },
@@ -492,8 +525,7 @@ const en: Content = {
         title: "Network Technician",
         company: "CTP Roberto Gamboa Valverde",
         points: [
-          "Studied the program for two years; half a year short of completing it.",
-          "TCP/IP networking, addressing, DNS and DHCP, cabling and network hardware.",
+          "TCP/IP networking, DNS, DHCP, cabling and hardware (two years completed).",
         ],
         skills: ["TCP/IP", "DNS / DHCP", "Hardware"],
       },
@@ -503,7 +535,7 @@ const en: Content = {
     index: "03",
     label: "Projects",
     title: "Things I've built",
-    intro: "Personal, university and team projects: what they are, why I built them and how they work under the hood.",
+    intro: "Personal, university and team projects. Open any of them to see how it works.",
     items: [
       {
         id: "gmo",
@@ -637,24 +669,24 @@ const en: Content = {
     title: "Real-world incident diagnosis,",
     highlight: "applied to software",
     intro:
-      "Incident response and my networking training taught me to diagnose with incomplete information, interdependent systems, affected users and defined response times. I apply that same discipline to development and support.",
+      "Three steps I use in support and in development.",
     steps: [
       {
         icon: "isolate",
         title: "Isolate",
-        text: "I separate device, network, service and application variables, then reproduce the failure with the smallest test that proves it.",
+        text: "I separate device, network, service and app, then reproduce the failure.",
         detail: "$ symptom → layer → root cause",
       },
       {
         icon: "inspect",
         title: "Inspect",
-        text: "I verify TCP/IP configuration, DNS and DHCP, connectivity and VPN, logs, service state and the data in the database.",
+        text: "I check network, DNS, VPN, logs, services and data.",
         detail: "$ network → service → database → app",
       },
       {
         icon: "resolve",
         title: "Resolve & document",
-        text: "I record evidence, impact and reproduction steps, then fix the issue or escalate it with the context the team needs.",
+        text: "I fix it or escalate it with the evidence the team needs.",
         detail: "$ reproduce → resolve → prevent",
       },
     ],
@@ -663,7 +695,7 @@ const en: Content = {
     index: "05",
     label: "Contact",
     title: "Let's talk",
-    text: "I'm looking for my next step as a Junior Software Developer, in a data role working with SQL and databases, or in IT and networking solving problems. If your team needs someone who learns fast and doesn't let go of a problem until it's solved, reach out.",
+    text: "I'm looking for my next step in Help Desk, IT support or as a Junior Developer. If that fits your team, reach out.",
     cta: "Get in touch",
   },
   footer: { built: "Built with Astro and Tailwind CSS" },

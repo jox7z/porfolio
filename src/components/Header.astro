@@ -35,6 +35,18 @@ const otherLang: Lang = lang === "es" ? "en" : "es"
     </nav>
 
     <div class="flex items-center gap-2">
+      <!-- Pausa o reanuda todas las animaciones durante la visita -->
+      <button
+        id="motion-toggle"
+        type="button"
+        class="hidden h-9 items-center gap-2 rounded-sm border border-line px-2.5 font-mono text-xs text-body transition hover:border-accent/60 hover:text-ink sm:flex"
+        aria-pressed="true"
+        data-on={t.ui.motionOn}
+        data-off={t.ui.motionOff}
+      >
+        <span class="motion-dot size-1.5 rounded-full bg-accent2" aria-hidden="true"></span>
+        <span class="motion-label">{t.ui.motionOn}</span>
+      </button>
       <a
         id="lang-switch"
         href={LANG_PATH[otherLang]}
@@ -100,6 +112,27 @@ const otherLang: Lang = lang === "es" ? "en" : "es"
     const onScroll = () => header?.classList.toggle("scrolled", window.scrollY > 8)
     onScroll()
     window.addEventListener("scroll", onScroll, { passive: true, signal: controller.signal })
+
+    // Botón Motion: refleja el estado actual y lo cambia (recarga para que todo arranque o se detenga limpio)
+    const motion = document.getElementById("motion-toggle") as HTMLButtonElement | null
+    if (motion) {
+      const off = document.documentElement.classList.contains("motion-off")
+      motion.setAttribute("aria-pressed", String(!off))
+      motion.querySelector(".motion-label")!.textContent = (off ? motion.dataset.off : motion.dataset.on) ?? ""
+      motion.querySelector(".motion-dot")?.classList.toggle("bg-accent2", !off)
+      motion.querySelector(".motion-dot")?.classList.toggle("bg-muted", off)
+      motion.addEventListener(
+        "click",
+        () => {
+          try {
+            sessionStorage.setItem("motion", off ? "on" : "off")
+            sessionStorage.setItem("intro-seen", "1")
+          } catch {}
+          location.reload()
+        },
+        { signal: controller.signal }
+      )
+    }
 
     // Al cambiar de idioma se conserva la sección actual
     const langSwitch = document.getElementById("lang-switch") as HTMLAnchorElement | null

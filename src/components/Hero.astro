@@ -3,6 +3,7 @@ import GitHubIcon from "@/components/icons/GitHub.astro"
 import LinkedInIcon from "@/components/icons/LinkedIn.astro"
 import MailIcon from "@/components/icons/Mail.astro"
 import CvButton from "@/components/CvButton.astro"
+import HeroNetwork from "@/components/HeroNetwork.astro"
 import { CONTENT, LINKS, type Lang } from "@/i18n/content"
 
 interface Props {
@@ -13,19 +14,14 @@ const { lang } = Astro.props
 const t = CONTENT[lang]
 ---
 
+<div class="relative isolate">
+<HeroNetwork />
 <section id="inicio" class="mx-auto grid max-w-6xl items-center gap-12 px-5 pb-16 pt-32 md:px-8 md:pt-40 lg:grid-cols-[1.1fr_1fr] lg:gap-16">
-  <div>
+  <div id="hero-copy" class="will-change-transform">
     <div class="reveal flex flex-wrap items-center gap-4">
-      <img
-        class="size-14 rounded-full object-cover ring-1 ring-line ring-offset-4 ring-offset-bg"
-        src="/cara.jpg"
-        alt="Jose Hernández"
-        width="56"
-        height="56"
-      />
-      <span class="inline-flex items-center gap-2 rounded-sm border border-accent2/30 bg-accent2/10 px-2.5 py-1 font-mono text-[11px] uppercase tracking-wider text-accent2">
+      <span class="inline-flex items-center gap-2 rounded-sm border border-accent2/30 bg-accent2/10 px-2.5 py-1 font-mono text-xs uppercase tracking-wider text-accent2">
         <span class="relative flex size-1.5">
-          <span class="absolute inline-flex size-full animate-ping rounded-full bg-accent2 opacity-70 motion-reduce:animate-none"></span>
+          <span class="absolute inline-flex size-full animate-ping rounded-full bg-accent2 opacity-70 motion-anim"></span>
           <span class="relative inline-flex size-1.5 rounded-full bg-accent2"></span>
         </span>
         {t.hero.status}
@@ -34,10 +30,24 @@ const t = CONTENT[lang]
 
     <p class="reveal mt-8 font-mono text-sm text-muted" style="--reveal-delay: 60ms">
       <span class="text-accent">&gt;</span>
-      {t.hero.greeting}
+      <span data-scramble>{t.hero.greeting}</span>
     </p>
-    <h1 class="reveal mt-3 text-4xl font-bold leading-[1.05] tracking-tight text-ink sm:text-6xl" style="--reveal-delay: 120ms">
-      {t.hero.role}<span class="cursor text-accent">_</span>
+    <!-- Cada letra sube con un pequeño retraso; el texto completo queda en aria-label -->
+    <h1 class="kinetic mt-3 text-4xl font-bold leading-[1.05] tracking-tight text-ink sm:text-6xl" aria-label={t.hero.role}>
+      {
+        t.hero.role.split(" ").map((word, w, words) => (
+          <>
+            {w > 0 && " "}
+            <span class="inline-block whitespace-nowrap" aria-hidden="true">
+              {[...word].map((char, c) => (
+                <span class="kinetic-char" style={`--i: ${words.slice(0, w).join("").length + c}`}>
+                  {char}
+                </span>
+              ))}{w === words.length - 1 && <span class="cursor text-accent">_</span>}
+            </span>
+          </>
+        ))
+      }
     </h1>
 
     <p class="reveal mt-6 max-w-lg text-lg leading-relaxed" style="--reveal-delay: 180ms">{t.hero.intro}</p>
@@ -61,7 +71,7 @@ const t = CONTENT[lang]
     </div>
 
     <div class="reveal mt-9 flex flex-wrap gap-3" style="--reveal-delay: 300ms">
-      <a href={LINKS.mailCompose} target="_blank" rel="noopener noreferrer" class="btn-primary group">
+      <a href={LINKS.mailCompose} target="_blank" rel="noopener noreferrer" class="btn-primary group" data-magnetic>
         <MailIcon class="size-4" />
         {t.hero.ctaPrimary}
         <span aria-hidden="true" class="transition-transform group-hover:translate-x-1">→</span>
@@ -76,46 +86,56 @@ const t = CONTENT[lang]
     </div>
   </div>
 
-  <!-- Terminal que se escribe sola -->
+  <!-- Terminal que se escribe sola y luego sigue "trabajando" con comandos en bucle -->
   <div class="reveal" style="--reveal-delay: 360ms">
-    <div class="overflow-hidden rounded-md border border-line bg-surface/80 shadow-2xl shadow-black/20">
-      <div class="flex items-center gap-2 border-b border-line px-4 py-3">
-        <span class="size-2.5 rounded-full bg-line"></span>
-        <span class="size-2.5 rounded-full bg-line"></span>
-        <span class="size-2.5 rounded-full bg-accent"></span>
-        <span class="ml-3 font-mono text-xs text-muted">jose@costa-rica: ~</span>
-      </div>
-      <div id="terminal" class="min-h-[16rem] space-y-4 p-5 font-mono text-[13px] leading-relaxed">
-        {
-          t.hero.terminal.map(({ command, output, live }) => (
-            <div class="term-line" data-command={command}>
+    <div id="hero-term" class="will-change-transform">
+      <div class="term-frame rounded-md p-px shadow-2xl shadow-black/30" data-tilt>
+        <div class="overflow-hidden rounded-[calc(0.375rem-1px)] bg-surface">
+          <div class="flex items-center gap-2 border-b border-line px-4 py-3">
+            <span class="size-2.5 rounded-full bg-line"></span>
+            <span class="size-2.5 rounded-full bg-line"></span>
+            <span class="size-2.5 rounded-full bg-accent"></span>
+            <span class="ml-3 font-mono text-xs text-muted">jose@costa-rica: ~</span>
+          </div>
+          <div id="terminal" class="min-h-[16rem] space-y-4 p-5 font-mono text-[13px] leading-relaxed">
+            {
+              t.hero.terminal.map(({ command, output, live }) => (
+                <div class="term-line" data-command={command}>
+                  <p>
+                    <span class="text-accent2">~</span>
+                    <span class="text-muted"> $ </span>
+                    <span class="term-cmd text-ink">{command}</span>
+                  </p>
+                  <p class="term-out text-body">
+                    {live ? <span class="cr-clock">San José, CR</span> : output}
+                  </p>
+                </div>
+              ))
+            }
+            <div aria-hidden="true">
               <p>
                 <span class="text-accent2">~</span>
                 <span class="text-muted"> $ </span>
-                <span class="term-cmd text-ink">{command}</span>
+                <span id="term-live-cmd" class="text-ink"></span>
+                <span class="caret inline-block h-4 w-2 translate-y-0.5 bg-accent"></span>
               </p>
-              <p class="term-out text-body">
-                {live ? <span class="cr-clock">San José, CR</span> : output}
-              </p>
+              <!-- Reserva una línea para que la terminal no cambie de alto -->
+              <p id="term-live-out" class="min-h-[1.625em] text-accent2"></p>
             </div>
-          ))
-        }
-        <p aria-hidden="true">
-          <span class="text-accent2">~</span>
-          <span class="text-muted"> $ </span>
-          <span class="inline-block h-4 w-2 translate-y-0.5 animate-pulse bg-accent motion-reduce:animate-none"></span>
-        </p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </section>
+</div>
 
 <a
   href="#sobre-mi"
-  class="reveal mx-auto flex max-w-6xl items-center gap-2 px-5 font-mono text-xs text-muted transition-colors hover:text-accent md:px-8"
+  class="reveal mx-auto mt-10 flex max-w-6xl items-center gap-2 px-5 font-mono text-xs text-muted transition-colors hover:text-accent md:px-8"
   style="--reveal-delay: 420ms"
 >
-  <span class="inline-block animate-bounce motion-reduce:animate-none" aria-hidden="true">↓</span>
+  <span class="inline-block animate-bounce motion-anim" aria-hidden="true">↓</span>
   {t.hero.scroll}
 </a>
 
@@ -138,15 +158,105 @@ const t = CONTENT[lang]
     }
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .cursor {
-      animation: none;
+  .kinetic-char {
+    display: inline-block;
+    animation: char-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: calc(200ms + var(--i) * 28ms);
+  }
+
+  @keyframes char-rise {
+    from {
+      opacity: 0;
+      transform: translateY(0.45em) rotateX(70deg);
+      filter: blur(6px);
     }
+    to {
+      opacity: 1;
+      transform: none;
+      filter: none;
+    }
+  }
+
+  .caret {
+    animation: blink 1s steps(1) infinite;
+  }
+
+  /* Borde de la terminal: una luz naranja-turquesa que recorre el contorno */
+  @property --term-angle {
+    syntax: "<angle>";
+    initial-value: 0deg;
+    inherits: false;
+  }
+
+  .term-frame {
+    background: conic-gradient(
+      from var(--term-angle),
+      rgb(var(--c-line)) 0deg,
+      rgb(var(--c-accent) / 0.9) 50deg,
+      rgb(var(--c-accent2) / 0.9) 100deg,
+      rgb(var(--c-line)) 150deg,
+      rgb(var(--c-line)) 360deg
+    );
+    animation: term-spin 6s linear infinite;
+  }
+
+  @keyframes term-spin {
+    to {
+      --term-angle: 360deg;
+    }
+  }
+
+  /* Movimiento desactivado con el botón Motion */
+  :global(html.motion-off) .cursor,
+  :global(html.motion-off) .caret,
+  :global(html.motion-off) .kinetic-char,
+  :global(html.motion-off) .term-frame {
+    animation: none;
+  }
+
+  :global(html.motion-off) .term-frame {
+    background: rgb(var(--c-line));
   }
 </style>
 
 <script>
   const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
+  // Comandos del día a día en soporte y desarrollo que la terminal repite en bucle
+  const LIVE: [command: string, output: string][] = [
+    ["ping -n 1 google.com", "Reply from 142.250.64.78: time=14ms"],
+    ["ipconfig /flushdns", "Successfully flushed the DNS Resolver Cache."],
+    ["sfc /scannow", "No integrity violations found."],
+    ["git push origin main", "→ deployed to Cloudflare Pages"],
+    ["ticket close #1042", "✓ resolved · documented"],
+  ]
+
+  // Parallax del hero: el texto sube y la terminal baja, rota y crece levemente mientras sales del inicio
+  document.addEventListener("astro:page-load", () => {
+    const copy = document.getElementById("hero-copy")
+    const term = document.getElementById("hero-term")
+    if (!copy || !term || document.documentElement.classList.contains("motion-off")) return
+
+    const controller = new AbortController()
+    document.addEventListener("astro:before-swap", () => controller.abort(), { once: true })
+
+    let frame = 0
+    const update = () => {
+      frame = 0
+      const desktop = window.innerWidth >= 1024
+      const p = Math.min(1, Math.max(0, window.scrollY / (window.innerHeight * 0.9)))
+      copy.style.transform = `translateY(${-p * (desktop ? 28 : 8)}px)`
+      term.style.transform = desktop
+        ? `translateY(${p * 55}px) rotate(${p * 4}deg) scale(${1 + p * 0.035})`
+        : `translateY(${p * 12}px) rotate(${p}deg)`
+    }
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(update)
+    }
+    update()
+    window.addEventListener("scroll", schedule, { passive: true, signal: controller.signal })
+    window.addEventListener("resize", schedule, { signal: controller.signal })
+  })
 
   document.addEventListener("astro:page-load", async () => {
     // Hora real de Costa Rica para el comando `date`
@@ -164,7 +274,7 @@ const t = CONTENT[lang]
     document.addEventListener("astro:before-swap", () => window.clearInterval(id), { once: true })
 
     const terminal = document.getElementById("terminal")
-    if (!terminal || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
+    if (!terminal || document.documentElement.classList.contains("motion-off")) return
 
     const lines = Array.from(terminal.querySelectorAll<HTMLElement>(".term-line"))
     // El texto completo queda en el HTML para lectores de pantalla y SEO; aquí solo se anima
@@ -175,6 +285,10 @@ const t = CONTENT[lang]
       line.querySelector<HTMLElement>(".term-out")?.classList.add("opacity-0")
     })
 
+    // Si está la pantalla de arranque, la terminal empieza a escribir cuando termina
+    if (document.documentElement.classList.contains("intro")) {
+      await new Promise((resolve) => document.addEventListener("intro:done", resolve, { once: true }))
+    }
     await sleep(600)
     for (const line of lines) {
       if (!line.isConnected) return
@@ -188,6 +302,27 @@ const t = CONTENT[lang]
       await sleep(200)
       out?.classList.remove("opacity-0")
       await sleep(350)
+    }
+
+    // Después sigue "trabajando": escribe un comando, muestra el resultado, lo borra y pasa al siguiente
+    const liveCmd = document.getElementById("term-live-cmd")
+    const liveOut = document.getElementById("term-live-out")
+    if (!liveCmd || !liveOut) return
+    for (let i = 0; liveCmd.isConnected; i = (i + 1) % LIVE.length) {
+      const [command, output] = LIVE[i]
+      await sleep(900)
+      for (const char of command) {
+        liveCmd.textContent += char
+        await sleep(55)
+      }
+      await sleep(350)
+      liveOut.textContent = output
+      await sleep(2600)
+      liveOut.textContent = ""
+      while (liveCmd.textContent) {
+        liveCmd.textContent = liveCmd.textContent.slice(0, -1)
+        await sleep(18)
+      }
     }
   })
 </script>

@@ -8,45 +8,6 @@ interface Props {
 const t = CONTENT[Astro.props.lang].about
 ---
 
-<div class="mt-10 grid gap-12 lg:grid-cols-[1.25fr_1fr] lg:gap-16">
-  <div class="space-y-5 leading-relaxed [&_strong]:font-medium [&_strong]:text-ink">
-    {t.paragraphs.map((paragraph, i) => <p class="reveal" style={`--reveal-delay: ${i * 80}ms`} set:html={paragraph} />)}
-
-    <dl class="reveal grid gap-6 border-t border-line pt-6 sm:grid-cols-2" style="--reveal-delay: 240ms">
-      {
-        t.facts.map(({ label, value }) => (
-          <div>
-            <dt class="font-mono text-[11px] uppercase tracking-widest text-muted">{label}</dt>
-            <dd class="mt-1 font-medium text-ink">{value}</dd>
-          </div>
-        ))
-      }
-    </dl>
-  </div>
-
-  <div class="reveal rounded-md border border-line bg-surface/60 p-5 font-mono text-sm" style="--reveal-delay: 120ms">
-    <p class="text-muted">
-      <span class="text-accent2">const</span> <span class="text-ink">{t.techTitle}</span> = {"{"}
-    </p>
-    <dl class="mt-2 space-y-4 pl-4">
-      {
-        t.tech.map(({ group, items }) => (
-          <div>
-            <dt class="text-muted">
-              <span class="text-accent">{group}</span>: [
-            </dt>
-            <dd class="mt-2 flex flex-wrap gap-1.5 pl-4">
-              {items.map((item) => (
-                <span class="rounded-sm border border-line px-2 py-0.5 text-xs text-body transition hover:border-accent/60 hover:text-ink">
-                  {item}
-                </span>
-              ))}
-            </dd>
-            <p class="text-muted" aria-hidden="true">],</p>
-          </div>
-        ))
-      }
-    </dl>
-    <p class="mt-2 text-muted">{"}"}</p>
-  </div>
+<div class="mt-10 max-w-3xl space-y-5 text-lg leading-relaxed [&_strong]:font-medium [&_strong]:text-ink">
+  {t.paragraphs.map((paragraph, i) => <p class="reveal" style={`--reveal-delay: ${i * 80}ms`} set:html={paragraph} />)}
 </div>

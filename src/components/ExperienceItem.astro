@@ -14,7 +14,7 @@ const { kind, date, title, company, points, skills } = Astro.props
 <article class="group grid gap-4 border-t border-line py-8 md:grid-cols-[11rem_1fr] md:gap-10">
   <div>
     <p class="font-mono text-sm text-ink transition-colors group-hover:text-accent">{date}</p>
-    <p class="mt-2 font-mono text-[11px] uppercase tracking-widest text-muted">{kind}</p>
+    <p class="mt-2 font-mono text-xs uppercase tracking-widest text-muted">{kind}</p>
   </div>
 
   <div>
@@ -33,7 +33,7 @@ const { kind, date, title, company, points, skills } = Astro.props
     </ul>
 
     <ul class="mt-5 flex flex-wrap gap-2" aria-label="Skills">
-      {skills.map((skill) => <li class="rounded-sm border border-line px-2 py-1 font-mono text-[11px] text-muted">{skill}</li>)}
+      {skills.map((skill) => <li class="rounded-sm border border-line px-2 py-1 font-mono text-xs text-muted">{skill}</li>)}
     </ul>
   </div>
 </article>

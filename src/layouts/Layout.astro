@@ -5,6 +5,7 @@ import { ViewTransitions } from "astro:transitions"
 import Header from "@/components/Header.astro"
 import Footer from "@/components/Footer.astro"
 import ScrollRail from "@/components/ScrollRail.astro"
+import IntroBoot from "@/components/IntroBoot.astro"
 import { LANG_PATH, type Lang } from "@/i18n/content"
 
 interface Props {
@@ -14,7 +15,7 @@ interface Props {
   showChrome?: boolean
 }
 
-const { description, title, lang = "es", showChrome = true } = Astro.props
+const { description, title, lang = "en", showChrome = true } = Astro.props
 const site = Astro.site ?? Astro.url
 ---
 
@@ -40,7 +41,22 @@ const site = Astro.site ?? Astro.url
       try {
         if (localStorage.getItem("theme") === "light") document.documentElement.classList.remove("dark")
       } catch {}
+      // Las animaciones están activas por defecto; el botón Motion las pausa durante la visita
+      try {
+        if (sessionStorage.getItem("motion") === "off") document.documentElement.classList.add("motion-off")
+      } catch {}
     </script>
+    {
+      showChrome && (
+        <script is:inline>
+          // Pantalla de arranque: solo en la primera visita de la sesión y con el movimiento activo
+          try {
+            if (!sessionStorage.getItem("intro-seen") && !document.documentElement.classList.contains("motion-off"))
+              document.documentElement.classList.add("intro")
+          } catch {}
+        </script>
+      )
+    }
     <ViewTransitions />
   </head>
 
@@ -57,6 +73,7 @@ const site = Astro.site ?? Astro.url
     {
       showChrome && (
         <>
+          <IntroBoot lang={lang} />
           <Header lang={lang} />
           <ScrollRail lang={lang} />
         </>
@@ -74,8 +91,8 @@ const site = Astro.site ?? Astro.url
         --c-bg: 246 245 241;
         --c-surface: 255 255 255;
         --c-ink: 20 21 23;
-        --c-body: 72 75 80;
-        --c-muted: 118 122 128;
+        --c-body: 55 58 63;
+        --c-muted: 100 104 110;
         --c-line: 222 220 213;
         --c-accent: 226 70 32;
         --c-accent2: 13 148 136;
@@ -86,8 +103,8 @@ const site = Astro.site ?? Astro.url
         --c-bg: 10 11 12;
         --c-surface: 20 21 23;
         --c-ink: 244 243 239;
-        --c-body: 178 182 188;
-        --c-muted: 139 143 148;
+        --c-body: 206 210 215;
+        --c-muted: 152 157 163;
         --c-line: 43 45 48;
         --c-accent: 255 90 53;
         --c-accent2: 51 230 201;
@@ -95,15 +112,21 @@ const site = Astro.site ?? Astro.url
 
       html {
         font-family: "Onest Variable", system-ui, sans-serif;
+        /* Base de 17px para que el texto largo se lea con comodidad */
+        font-size: 106.25%;
         scroll-behavior: smooth;
         scroll-padding-top: 5rem;
       }
 
-      /* Retícula en toda la página */
+      body {
+        line-height: 1.7;
+      }
+
+      /* Retícula en toda la página, tenue para no competir con el texto */
       .bg-grid {
         background-image:
-          linear-gradient(to right, rgb(var(--c-line) / 0.5) 1px, transparent 1px),
-          linear-gradient(to bottom, rgb(var(--c-line) / 0.5) 1px, transparent 1px);
+          linear-gradient(to right, rgb(var(--c-line) / 0.3) 1px, transparent 1px),
+          linear-gradient(to bottom, rgb(var(--c-line) / 0.3) 1px, transparent 1px);
         background-size: 56px 56px;
       }
 
@@ -125,10 +148,9 @@ const site = Astro.site ?? Astro.url
         }
       }
 
-      @media (prefers-reduced-motion: reduce) {
-        .bg-glow {
-          animation: none;
-        }
+      /* Movimiento desactivado con el botón Motion */
+      html.motion-off .bg-glow {
+        animation: none;
       }
 
       /* Motivo de carril de pista (compartido con el Media Kit) */
@@ -179,20 +201,72 @@ const site = Astro.site ?? Astro.url
         transform: none;
       }
 
-      @media (prefers-reduced-motion: reduce) {
-        html {
-          scroll-behavior: auto;
-        }
+      /* Mientras corre la pantalla de arranque no se hace scroll ni empiezan las animaciones del hero */
+      html.intro {
+        overflow: hidden;
+      }
 
-        .reveal {
-          opacity: 1;
-          transform: none;
-          transition: none;
-        }
+      html.intro .kinetic-char {
+        animation-play-state: paused;
+      }
+
+      /* Inclinación 3D que sigue al cursor (ver [data-tilt] en el script) */
+      [data-tilt] {
+        transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+        transition:
+          transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+          border-color 0.3s ease;
+        will-change: transform;
+      }
+
+      /* Botón que se acerca un poco al cursor */
+      [data-magnetic] {
+        transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      /* Movimiento desactivado con el botón Motion */
+      html.motion-off {
+        scroll-behavior: auto;
+      }
+
+      html.motion-off .reveal {
+        opacity: 1;
+        transform: none;
+        transition: none;
+      }
+
+      html.motion-off [data-tilt],
+      html.motion-off [data-magnetic] {
+        transform: none !important;
+      }
+
+      html.motion-off .motion-anim {
+        animation: none;
       }
     </style>
 
     <script>
+      const GLYPHS = "!<>-_\\/[]{}=+*^?#01"
+      const reduceMotion = () => document.documentElement.classList.contains("motion-off")
+
+      // Texto que se "descifra" de izquierda a derecha (solo en textos monoespaciados, sin saltos de línea)
+      const scramble = (el: HTMLElement) => {
+        const final = el.dataset.final ?? el.textContent ?? ""
+        el.dataset.final = final
+        if (reduceMotion()) return
+        const duration = 700
+        const start = performance.now()
+        const tick = (now: number) => {
+          const progress = Math.min(1, (now - start) / duration)
+          const shown = Math.floor(progress * final.length)
+          el.textContent = [...final]
+            .map((char, i) => (i < shown || char === " " ? char : GLYPHS[Math.floor(Math.random() * GLYPHS.length)]))
+            .join("")
+          if (progress < 1) requestAnimationFrame(tick)
+        }
+        requestAnimationFrame(tick)
+      }
+
       document.addEventListener("astro:page-load", () => {
         const controller = new AbortController()
         document.addEventListener("astro:before-swap", () => controller.abort(), { once: true })
@@ -201,16 +275,58 @@ const site = Astro.site ?? Astro.url
           (entries) => {
             entries.forEach((entry) => {
               if (!entry.isIntersecting) return
-              entry.target.classList.add("is-visible")
-              observer.unobserve(entry.target)
+              const target = entry.target as HTMLElement
+              target.classList.add("is-visible")
+              target.querySelectorAll<HTMLElement>("[data-scramble]").forEach(scramble)
+              observer.unobserve(target)
             })
           },
           { rootMargin: "0px 0px -8% 0px", threshold: 0.08 }
         )
-        document.querySelectorAll(".reveal").forEach((item) => observer.observe(item))
+        // Los revelados esperan a que termine la pantalla de arranque, si está activa
+        const observeAll = () => document.querySelectorAll(".reveal").forEach((item) => observer.observe(item))
+        if (document.documentElement.classList.contains("intro"))
+          document.addEventListener("intro:done", observeAll, { once: true, signal: controller.signal })
+        else observeAll()
         controller.signal.addEventListener("abort", () => observer.disconnect())
 
-        if (!window.matchMedia("(pointer: fine)").matches) return
+        if (!window.matchMedia("(pointer: fine)").matches || reduceMotion()) return
+
+        document.querySelectorAll<HTMLElement>("[data-tilt]").forEach((card) => {
+          card.addEventListener(
+            "pointermove",
+            (event) => {
+              const rect = card.getBoundingClientRect()
+              const x = (event.clientX - rect.left) / rect.width - 0.5
+              const y = (event.clientY - rect.top) / rect.height - 0.5
+              card.style.setProperty("--rx", `${(-y * 6).toFixed(2)}deg`)
+              card.style.setProperty("--ry", `${(x * 6).toFixed(2)}deg`)
+            },
+            { signal: controller.signal }
+          )
+          card.addEventListener(
+            "pointerleave",
+            () => {
+              card.style.setProperty("--rx", "0deg")
+              card.style.setProperty("--ry", "0deg")
+            },
+            { signal: controller.signal }
+          )
+        })
+
+        document.querySelectorAll<HTMLElement>("[data-magnetic]").forEach((button) => {
+          button.addEventListener(
+            "pointermove",
+            (event) => {
+              const rect = button.getBoundingClientRect()
+              const x = event.clientX - rect.left - rect.width / 2
+              const y = event.clientY - rect.top - rect.height / 2
+              button.style.transform = `translate(${x * 0.25}px, ${y * 0.35}px)`
+            },
+            { signal: controller.signal }
+          )
+          button.addEventListener("pointerleave", () => (button.style.transform = ""), { signal: controller.signal })
+        })
         document.querySelectorAll<HTMLElement>(".surface-glow").forEach((card) => {
           card.addEventListener(
             "pointermove",

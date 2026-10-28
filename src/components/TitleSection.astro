@@ -10,10 +10,41 @@ const { index, label } = Astro.props
 <div class="reveal">
   <p class="flex items-center gap-3 font-mono text-xs uppercase tracking-widest text-muted">
     <span class="text-accent">{index}.</span>
-    {label}
-    <span class="h-px flex-1 bg-line" aria-hidden="true"></span>
+    <span data-scramble>{label}</span>
+    <span class="rule h-px flex-1 origin-left bg-line" aria-hidden="true"></span>
   </p>
-  <h2 class="mt-5 max-w-3xl text-3xl font-bold tracking-tight text-ink sm:text-4xl">
-    <slot />
+  <!-- El título sube desde detrás de una máscara al aparecer -->
+  <h2 class="line-mask mt-5 max-w-3xl text-3xl font-bold tracking-tight text-ink sm:text-4xl">
+    <span class="line-inner"><slot /></span>
   </h2>
 </div>
+
+<style>
+  .line-mask {
+    overflow: hidden;
+    padding-bottom: 0.08em;
+  }
+
+  .line-inner {
+    display: block;
+    transform: translateY(110%);
+    transition: transform 1s cubic-bezier(0.22, 1, 0.36, 1) 0.15s;
+  }
+
+  /* La línea divisoria se dibuja de izquierda a derecha */
+  .rule {
+    transform: scaleX(0);
+    transition: transform 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.1s;
+  }
+
+  :global(.reveal.is-visible) .line-inner,
+  :global(.reveal.is-visible) .rule {
+    transform: none;
+  }
+
+  :global(html.motion-off) .line-inner,
+  :global(html.motion-off) .rule {
+    transform: none;
+    transition: none;
+  }
+</style>

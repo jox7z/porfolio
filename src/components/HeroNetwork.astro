@@ -1,0 +1,161 @@
+<!--
+  Fondo del hero: una red de nodos que se mueven despacio y se conectan entre sí,
+  como una topología de red. Los nodos cercanos al cursor se enlazan con él.
+-->
+<canvas id="hero-network" class="network-mask pointer-events-none absolute inset-0 -z-10 h-full w-full" aria-hidden="true"></canvas>
+
+<style>
+  /* Se desvanece hacia los bordes para no competir con el texto */
+  .network-mask {
+    mask-image: radial-gradient(ellipse 75% 70% at 60% 45%, #000 30%, transparent 85%);
+  }
+</style>
+
+<script>
+  interface Node {
+    x: number
+    y: number
+    vx: number
+    vy: number
+    r: number
+  }
+
+  const LINK_DISTANCE = 140
+  const CURSOR_DISTANCE = 190
+
+  document.addEventListener("astro:page-load", () => {
+    const canvas = document.getElementById("hero-network") as HTMLCanvasElement | null
+    const ctx = canvas?.getContext("2d")
+    if (!canvas || !ctx) return
+
+    const controller = new AbortController()
+    document.addEventListener("astro:before-swap", () => controller.abort(), { once: true })
+
+    const reduceMotion = document.documentElement.classList.contains("motion-off")
+    const cursor = { x: -9999, y: -9999 }
+    let nodes: Node[] = []
+    let width = 0
+    let height = 0
+    let frame = 0
+    let visible = true
+
+    // Los colores salen de los tokens del tema, así respetan el modo claro/oscuro
+    const token = (name: string) =>
+      getComputedStyle(document.documentElement).getPropertyValue(`--c-${name}`).trim().split(" ").join(",")
+
+    const resize = () => {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2)
+      width = canvas.clientWidth
+      height = canvas.clientHeight
+      canvas.width = width * dpr
+      canvas.height = height * dpr
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+
+      const count = Math.min(80, Math.round((width * height) / 15000))
+      nodes = Array.from({ length: count }, () => ({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        vx: (Math.random() - 0.5) * 0.35,
+        vy: (Math.random() - 0.5) * 0.35,
+        r: Math.random() * 1.4 + 0.8,
+      }))
+    }
+
+    const draw = () => {
+      ctx.clearRect(0, 0, width, height)
+      // Se leen una vez por cuadro: el tema puede cambiar en cualquier momento
+      const teal = token("accent2")
+      const orange = token("accent")
+      const node = `rgba(${teal},0.75)`
+
+      for (let i = 0; i < nodes.length; i++) {
+        const a = nodes[i]
+        for (let j = i + 1; j < nodes.length; j++) {
+          const b = nodes[j]
+          const dist = Math.hypot(a.x - b.x, a.y - b.y)
+          if (dist > LINK_DISTANCE) continue
+          ctx.strokeStyle = `rgba(${teal},${(1 - dist / LINK_DISTANCE) * 0.22})`
+          ctx.lineWidth = 1
+          ctx.beginPath()
+          ctx.moveTo(a.x, a.y)
+          ctx.lineTo(b.x, b.y)
+          ctx.stroke()
+        }
+
+        const toCursor = Math.hypot(a.x - cursor.x, a.y - cursor.y)
+        if (toCursor < CURSOR_DISTANCE) {
+          ctx.strokeStyle = `rgba(${orange},${(1 - toCursor / CURSOR_DISTANCE) * 0.5})`
+          ctx.beginPath()
+          ctx.moveTo(a.x, a.y)
+          ctx.lineTo(cursor.x, cursor.y)
+          ctx.stroke()
+        }
+
+        ctx.fillStyle = node
+        ctx.beginPath()
+        ctx.arc(a.x, a.y, a.r, 0, Math.PI * 2)
+        ctx.fill()
+      }
+    }
+
+    const step = () => {
+      frame = 0
+      for (const n of nodes) {
+        n.x += n.vx
+        n.y += n.vy
+        if (n.x < 0 || n.x > width) n.vx *= -1
+        if (n.y < 0 || n.y > height) n.vy *= -1
+      }
+      draw()
+      if (visible && !document.hidden) frame = requestAnimationFrame(step)
+    }
+
+    const start = () => {
+      if (!frame && !reduceMotion) frame = requestAnimationFrame(step)
+    }
+
+    resize()
+    draw()
+    start()
+
+    window.addEventListener(
+      "resize",
+      () => {
+        resize()
+        draw()
+      },
+      { signal: controller.signal }
+    )
+
+    // Solo se anima mientras el hero está en pantalla
+    const observer = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting
+      if (visible) start()
+    })
+    observer.observe(canvas)
+    controller.signal.addEventListener("abort", () => {
+      observer.disconnect()
+      cancelAnimationFrame(frame)
+    })
+    document.addEventListener("visibilitychange", start, { signal: controller.signal })
+
+    if (reduceMotion || !window.matchMedia("(pointer: fine)").matches) return
+    const hero = canvas.parentElement
+    hero?.addEventListener(
+      "pointermove",
+      (event) => {
+        const rect = canvas.getBoundingClientRect()
+        cursor.x = event.clientX - rect.left
+        cursor.y = event.clientY - rect.top
+      },
+      { signal: controller.signal }
+    )
+    hero?.addEventListener(
+      "pointerleave",
+      () => {
+        cursor.x = cursor.y = -9999
+      },
+      { signal: controller.signal }
+    )
+  })
+</script>
