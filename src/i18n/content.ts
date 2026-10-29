@@ -54,11 +54,8 @@ interface Content {
     howItWorks: string
     stack: string
     opensNewTab: string
-    motionOn: string
-    motionOff: string
   }
   hero: {
-    status: string
     greeting: string
     role: string
     openTo: string
@@ -66,7 +63,6 @@ interface Content {
     learning: string
     intro: string
     ctaPrimary: string
-    scroll: string
     terminal: { command: string; output: string; live?: boolean }[]
   }
   about: {
@@ -134,11 +130,8 @@ const es: Content = {
     howItWorks: "Cómo funciona",
     stack: "Tecnologías",
     opensNewTab: "se abre en otra pestaña",
-    motionOn: "Movimiento activado",
-    motionOff: "Movimiento en pausa",
   },
   hero: {
-    status: "Disponible para trabajar",
     greeting: "Hola, soy Jose Hernández",
     role: "Computer Systems Engineer",
     openTo: "Abierto a",
@@ -147,7 +140,6 @@ const es: Content = {
     intro:
       "Reparo computadoras, atiendo usuarios en español e inglés y desarrollo software.",
     ctaPrimary: "Escríbeme",
-    scroll: "scroll para ver mi trabajo",
     terminal: [
       { command: "whoami", output: "it-support-technician · systems-engineer" },
       { command: "cat open-to.txt", output: "help-desk · it-support · junior-dev" },
@@ -370,28 +362,27 @@ const es: Content = {
   approach: {
     index: "04",
     label: "Método",
-    title: "Diagnóstico de incidentes reales,",
-    highlight: "aplicado al software",
-    intro:
-      "Tres pasos que uso tanto en soporte como en desarrollo.",
+    title: "Pienso en sistemas,",
+    highlight: "del hardware al código",
+    intro: "Un sistema computacional son capas que dependen entre sí. Resuelvo problemas siguiéndolos a través de cada una.",
     steps: [
       {
         icon: "isolate",
-        title: "Aislar",
-        text: "Separo dispositivo, red, servicio y aplicación, y reproduzco la falla.",
-        detail: "$ síntoma → capa → causa raíz",
+        title: "Modelar el sistema",
+        text: "Identifico las capas involucradas: hardware, sistema operativo, red, aplicación y datos, y cómo se conectan.",
+        detail: "$ hardware → so → red → app → datos",
       },
       {
         icon: "inspect",
-        title: "Inspeccionar",
-        text: "Reviso red, DNS, VPN, logs, servicios y datos.",
-        detail: "$ red → servicio → base de datos → app",
+        title: "Rastrear la falla",
+        text: "Sigo el problema capa por capa y pruebo una hipótesis a la vez hasta dar con la causa raíz.",
+        detail: "$ síntoma → capa → causa raíz",
       },
       {
         icon: "resolve",
-        title: "Resolver y documentar",
-        text: "Lo resuelvo o lo escalo con la evidencia que el equipo necesita.",
-        detail: "$ reproducir → resolver → prevenir",
+        title: "Corregir y mejorar",
+        text: "Lo corrijo en la capa correcta, lo verifico de punta a punta y lo documento para que el sistema sea más confiable.",
+        detail: "$ corregir → verificar → documentar",
       },
     ],
   },
@@ -430,11 +421,8 @@ const en: Content = {
     howItWorks: "How it works",
     stack: "Technologies",
     opensNewTab: "opens in a new tab",
-    motionOn: "Motion on",
-    motionOff: "Motion paused",
   },
   hero: {
-    status: "Available for work",
     greeting: "Hi, I'm Jose Hernández",
     role: "Computer Systems Engineer",
     openTo: "Open to",
@@ -443,7 +431,6 @@ const en: Content = {
     intro:
       "I fix computers, support users in English and Spanish, and build software.",
     ctaPrimary: "Get in touch",
-    scroll: "scroll to see my work",
     terminal: [
       { command: "whoami", output: "it-support-technician · systems-engineer" },
       { command: "cat open-to.txt", output: "help-desk · it-support · junior-dev" },
@@ -666,28 +653,27 @@ const en: Content = {
   approach: {
     index: "04",
     label: "Method",
-    title: "Real-world incident diagnosis,",
-    highlight: "applied to software",
-    intro:
-      "Three steps I use in support and in development.",
+    title: "Thinking in systems,",
+    highlight: "from hardware to code",
+    intro: "A computer system is layers that depend on each other. I solve problems by tracing them through every one.",
     steps: [
       {
         icon: "isolate",
-        title: "Isolate",
-        text: "I separate device, network, service and app, then reproduce the failure.",
-        detail: "$ symptom → layer → root cause",
+        title: "Model the system",
+        text: "I map the layers involved: hardware, operating system, network, application and data, and how they connect.",
+        detail: "$ hardware → os → network → app → data",
       },
       {
         icon: "inspect",
-        title: "Inspect",
-        text: "I check network, DNS, VPN, logs, services and data.",
-        detail: "$ network → service → database → app",
+        title: "Trace the failure",
+        text: "I follow the problem layer by layer, testing one hypothesis at a time until I find the root cause.",
+        detail: "$ symptom → layer → root cause",
       },
       {
         icon: "resolve",
-        title: "Resolve & document",
-        text: "I fix it or escalate it with the evidence the team needs.",
-        detail: "$ reproduce → resolve → prevent",
+        title: "Fix & improve",
+        text: "I fix it at the right layer, verify it end to end and document it so the system becomes more reliable.",
+        detail: "$ fix → verify → document",
       },
     ],
   },

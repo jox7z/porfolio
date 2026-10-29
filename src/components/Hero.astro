@@ -18,22 +18,12 @@ const t = CONTENT[lang]
 <HeroNetwork />
 <section id="inicio" class="mx-auto grid max-w-6xl items-center gap-12 px-5 pb-16 pt-32 md:px-8 md:pt-40 lg:grid-cols-[1.1fr_1fr] lg:gap-16">
   <div id="hero-copy" class="will-change-transform">
-    <div class="reveal flex flex-wrap items-center gap-4">
-      <span class="inline-flex items-center gap-2 rounded-sm border border-accent2/30 bg-accent2/10 px-2.5 py-1 font-mono text-xs uppercase tracking-wider text-accent2">
-        <span class="relative flex size-1.5">
-          <span class="absolute inline-flex size-full animate-ping rounded-full bg-accent2 opacity-70 motion-anim"></span>
-          <span class="relative inline-flex size-1.5 rounded-full bg-accent2"></span>
-        </span>
-        {t.hero.status}
-      </span>
-    </div>
-
-    <p class="reveal mt-8 font-mono text-sm text-muted" style="--reveal-delay: 60ms">
+    <p class="reveal font-mono text-sm text-muted">
       <span class="text-accent">&gt;</span>
       <span data-scramble>{t.hero.greeting}</span>
     </p>
     <!-- Cada letra sube con un pequeño retraso; el texto completo queda en aria-label -->
-    <h1 class="kinetic mt-3 text-4xl font-bold leading-[1.05] tracking-tight text-ink sm:text-6xl" aria-label={t.hero.role}>
+    <h1 class="reveal kinetic mt-3 text-4xl font-bold leading-[1.05] tracking-tight text-ink sm:text-6xl" aria-label={t.hero.role}>
       {
         t.hero.role.split(" ").map((word, w, words) => (
           <>
@@ -130,14 +120,6 @@ const t = CONTENT[lang]
 </section>
 </div>
 
-<a
-  href="#sobre-mi"
-  class="reveal mx-auto mt-10 flex max-w-6xl items-center gap-2 px-5 font-mono text-xs text-muted transition-colors hover:text-accent md:px-8"
-  style="--reveal-delay: 420ms"
->
-  <span class="inline-block animate-bounce motion-anim" aria-hidden="true">↓</span>
-  {t.hero.scroll}
-</a>
 
 <style>
   .btn-primary {
@@ -160,8 +142,13 @@ const t = CONTENT[lang]
 
   .kinetic-char {
     display: inline-block;
+    animation-play-state: paused;
     animation: char-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
     animation-delay: calc(200ms + var(--i) * 28ms);
+  }
+
+  .kinetic.is-visible .kinetic-char {
+    animation-play-state: running;
   }
 
   @keyframes char-rise {
@@ -244,7 +231,9 @@ const t = CONTENT[lang]
     const update = () => {
       frame = 0
       const desktop = window.innerWidth >= 1024
-      const p = Math.min(1, Math.max(0, window.scrollY / (window.innerHeight * 0.9)))
+      // Avance desde que el hero toca el borde superior de la pantalla
+      const top = copy.parentElement?.getBoundingClientRect().top ?? 0
+      const p = Math.min(1, Math.max(0, -top / (window.innerHeight * 0.9)))
       copy.style.transform = `translateY(${-p * (desktop ? 28 : 8)}px)`
       term.style.transform = desktop
         ? `translateY(${p * 55}px) rotate(${p * 4}deg) scale(${1 + p * 0.035})`

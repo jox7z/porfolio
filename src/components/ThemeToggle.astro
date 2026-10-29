@@ -40,11 +40,10 @@ const { label } = Astro.props
     })
   })
 
-  // Las transiciones de vista reemplazan <html>: se reaplican el tema y el estado del botón Motion
+  // Las transiciones de vista reemplazan <html>: se reaplica el tema guardado
   document.addEventListener("astro:after-swap", () => {
     try {
       if (localStorage.getItem("theme") === "light") document.documentElement.classList.remove("dark")
-      if (sessionStorage.getItem("motion") === "off") document.documentElement.classList.add("motion-off")
     } catch {}
   })
 </script>

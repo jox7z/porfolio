@@ -41,10 +41,6 @@ const site = Astro.site ?? Astro.url
       try {
         if (localStorage.getItem("theme") === "light") document.documentElement.classList.remove("dark")
       } catch {}
-      // Las animaciones están activas por defecto; el botón Motion las pausa durante la visita
-      try {
-        if (sessionStorage.getItem("motion") === "off") document.documentElement.classList.add("motion-off")
-      } catch {}
     </script>
     {
       showChrome && (
